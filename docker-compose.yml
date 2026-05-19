@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: sca_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_2024
+      MYSQL_DATABASE:      sca_db
+      MYSQL_USER:          sca_user
+      MYSQL_PASSWORD:      sca_pass_2024
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+    ports:
+      - "3307:3306"
+    networks:
+      - sca_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password_2024"]
+      interval: 10s
+      timeout:  5s
+      retries:  5
+
+  backend:
+    build:
+      context:    .
+      dockerfile: docker/Dockerfile.backend
+    container_name: sca_backend
+    restart: unless-stopped
+    environment:
+      DB_HOST:        mysql
+      DB_PORT:        3306
+      DB_NAME:        sca_db
+      DB_USER:        sca_user
+      DB_PASS:        sca_pass_2024
+      JWT_SECRET:     clave_super_secreta_docker_2024
+      JWT_EXPIRATION: 86400
+      APP_ENV:        production
+      CORS_ORIGINS:   http://localhost:8081
+    ports:
+      - "8000:80"
+    networks:
+      - sca_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context:    .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: sca_frontend
+    restart: unless-stopped
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+    ports:
+      - "8081:8081"
+    networks:
+      - sca_network
+    depends_on:
+      - backend
+
+networks:
+  sca_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
