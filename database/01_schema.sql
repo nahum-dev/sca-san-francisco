@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS CURSOS (
     periodo       VARCHAR(20)  NOT NULL,
     grado         VARCHAR(30)  NOT NULL,
     seccion       VARCHAR(5)   NOT NULL,
+    activo        TINYINT(1)   NOT NULL DEFAULT 1,
     created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     FOREIGN KEY (asignatura_id) REFERENCES ASIGNATURAS(id),
