@@ -6,11 +6,11 @@ import api from './api';
 const estudianteService = {
 
   getAll: async (search = '') => {
-    const response = await api.get('/estudiantes', {
-      params: { search },
-    });
-    return response.data.data;
-  },
+  const response = await api.get('/estudiantes', {
+    params: { search: search.trim() },
+  });
+  return response.data.data;
+},
 
   getById: async (id) => {
     const response = await api.get(`/estudiantes/${id}`);

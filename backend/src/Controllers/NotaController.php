@@ -29,43 +29,60 @@ final class NotaController
      * DELETE /api/notas/5            → eliminar nota
      */
     public function handle(string $method, string $uri): void
-    {
-        AuthMiddleware::authorize([
-            AuthMiddleware::ROL_ADMIN,
-            AuthMiddleware::ROL_DOCENTE,
-        ]);
+{
+    AuthMiddleware::authorize([
+        AuthMiddleware::ROL_ADMIN,
+        AuthMiddleware::ROL_DOCENTE,
+        AuthMiddleware::ROL_ESTUDIANTE,
+    ]);
 
-        $parts = explode('/', trim($uri, '/'));
-        $id    = isset($parts[2]) && is_numeric($parts[2]) ? (int)$parts[2] : null;
+    $parts = explode('/', trim($uri, '/'));
+    $id    = isset($parts[2]) && is_numeric($parts[2]) ? (int)$parts[2] : null;
 
-        match(true) {
-            $method === 'GET'    && $id === null => $this->index(),
-            $method === 'POST'   && $id === null => $this->store(),
-            $method === 'PUT'    && $id !== null => $this->update($id),
-            $method === 'DELETE' && $id !== null => $this->destroy($id),
-            default => ResponseHelper::notFound('Ruta de notas')
-        };
+    if ($method === 'GET' && $id === null) {
+        $this->index();
+    } elseif ($method === 'POST' && $id === null) {
+        $this->store();
+    } elseif ($method === 'PUT' && $id !== null) {
+        $this->update($id);
+    } elseif ($method === 'DELETE' && $id !== null) {
+        $this->destroy($id);
+    } else {
+        ResponseHelper::notFound('Ruta de notas');
     }
-
+}
     /**
      * GET /api/notas?matricula_id=1
      */
     private function index(): void
-    {
-        $matriculaId = (int)($_GET['matricula_id'] ?? 0);
+{
+    $payload     = AuthMiddleware::authenticate();
+    $matriculaId = (int)($_GET['matricula_id'] ?? 0);
 
-        if ($matriculaId === 0) {
-            ResponseHelper::error('El parámetro matricula_id es obligatorio.', 400);
+    if ($matriculaId === 0) {
+        ResponseHelper::error('El parámetro matricula_id es obligatorio.', 400);
+    }
+
+    if ((int)$payload->data->rol === AuthMiddleware::ROL_ESTUDIANTE) {
+        if (!isset($payload->data->estudiante_id)) {
+            ResponseHelper::error('No tienes un perfil de estudiante asociado.', 403);
         }
-
-        try {
-            $notas = $this->service->getByMatricula($matriculaId);
-            ResponseHelper::success($notas, 'Notas obtenidas correctamente.');
-        } catch (RuntimeException $e) {
-            ResponseHelper::error($e->getMessage(), (int)($e->getCode() ?: 400));
+        $pdo  = \App\Config\Database::getConnection();
+        $sql  = "SELECT COUNT(*) FROM MATRICULA WHERE id = :mid AND estudiante_id = :eid";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':mid' => $matriculaId, ':eid' => $payload->data->estudiante_id]);
+        if ((int)$stmt->fetchColumn() === 0) {
+            ResponseHelper::error('No tienes acceso a estas notas.', 403);
         }
     }
 
+    try {
+        $notas = $this->service->getByMatricula($matriculaId);
+        ResponseHelper::success($notas, 'Notas obtenidas correctamente.');
+    } catch (\RuntimeException $e) {
+        ResponseHelper::error($e->getMessage(), (int)($e->getCode() ?: 400));
+    }
+}
     /**
      * POST /api/notas
      */

@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import { COLORS } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AsistenciaScreen() {
   const [cursoId,     setCursoId]     = useState('');
@@ -30,6 +31,13 @@ export default function AsistenciaScreen() {
     tardanza:    '#F39C12',
     justificado: '#8E44AD',
   };
+
+  const ESTADO_ICONOS = {
+  presente:    { nombre: 'checkmark-circle', color: '#27AE60' },
+  ausente:     { nombre: 'close-circle',     color: '#E74C3C' },
+  tardanza:    { nombre: 'time',             color: '#F39C12' },
+  justificado: { nombre: 'clipboard',        color: '#8E44AD' },
+};
 
   const cargarAsistencia = async () => {
     if (!cursoId.trim()) {
@@ -116,15 +124,20 @@ export default function AsistenciaScreen() {
           ]}
           onPress={() => cambiarEstado(item.matricula_id, estado)}
         >
+          <Ionicons
+            name={ESTADO_ICONOS[estado]?.nombre || 'ellipse'}
+            size={14}
+            color={item.estadoSeleccionado === estado ? COLORS.white : ESTADO_COLORES[estado]}
+          />
           <Text style={[
             styles.estadoBtnTexto,
             { color: ESTADO_COLORES[estado] },
             item.estadoSeleccionado === estado && { color: COLORS.white },
           ]}>
-            {estado.charAt(0).toUpperCase() + estado.slice(1)}
+            {' '}{estado.charAt(0).toUpperCase() + estado.slice(1)}
           </Text>
         </TouchableOpacity>
-      ))}
+      ))} 
     </ScrollView>
   </View>
   );
@@ -279,13 +292,7 @@ const styles = StyleSheet.create({
   estadosRow: {
     flexDirection: 'row',
   },
-  estadoBtn: {
-    borderWidth:       1,
-    borderRadius:      20,
-    paddingVertical:   6,
-    paddingHorizontal: 14,
-    marginRight:       8,
-  },
+  estadoBtn: { borderWidth: 1, borderRadius: 20, paddingVertical: 6, paddingHorizontal: 12, marginRight: 8, flexDirection: 'row', alignItems: 'center' },
   estadoBtnTexto: {
     fontSize:   12,
     fontWeight: '600',

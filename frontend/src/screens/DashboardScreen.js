@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import authService from '../services/authService';
 import { COLORS, ROLES } from '../utils/constants';
 import { Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
@@ -59,15 +60,15 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const menuItems = [
-    { titulo: 'Estudiantes', descripcion: 'Gestionar estudiantes', icono: '👨‍🎓', pantalla: 'Estudiantes',  roles: [ROLES.ADMIN] },
-    { titulo: 'Docentes',    descripcion: 'Gestionar docentes',    icono: '👨‍🏫', pantalla: 'Docentes',     roles: [ROLES.ADMIN] },
-    { titulo: 'Asignaturas', descripcion: 'Gestionar materias',    icono: '📚',  pantalla: 'Asignaturas',  roles: [ROLES.ADMIN] },
-    { titulo: 'Cursos',      descripcion: 'Gestionar cursos',      icono: '🏫',  pantalla: 'Cursos',       roles: [ROLES.ADMIN] },
-    { titulo: 'Asistencia',  descripcion: 'Registrar asistencia',  icono: '📋',  pantalla: 'Asistencia',   roles: [ROLES.ADMIN, ROLES.DOCENTE] },
-    { titulo: 'Notas',       descripcion: 'Registrar notas',       icono: '✏️',  pantalla: 'Notas',        roles: [ROLES.ADMIN, ROLES.DOCENTE] },
-    { titulo: 'Mis Cursos',  descripcion: 'Ver mis cursos',        icono: '🗂️',  pantalla: 'MisCursos',    roles: [ROLES.DOCENTE] },
-    { titulo: 'Mi Perfil',   descripcion: 'Ver mis datos',         icono: '👤',  pantalla: 'MiPerfil',     roles: [ROLES.ESTUDIANTE] },
-  ];
+  { titulo: 'Estudiantes', descripcion: 'Gestionar estudiantes',  icono: 'people',          pantalla: 'Estudiantes',  roles: [ROLES.ADMIN] },
+  { titulo: 'Docentes',    descripcion: 'Gestionar docentes',     icono: 'person-circle',   pantalla: 'Docentes',     roles: [ROLES.ADMIN] },
+  { titulo: 'Asignaturas', descripcion: 'Gestionar materias',     icono: 'book',            pantalla: 'Asignaturas',  roles: [ROLES.ADMIN] },
+  { titulo: 'Cursos',      descripcion: 'Gestionar cursos',       icono: 'school',          pantalla: 'Cursos',       roles: [ROLES.ADMIN] },
+  { titulo: 'Asistencia',  descripcion: 'Registrar asistencia',   icono: 'checkbox',        pantalla: 'Asistencia',   roles: [ROLES.ADMIN, ROLES.DOCENTE] },
+  { titulo: 'Notas',       descripcion: 'Registrar notas',        icono: 'create',          pantalla: 'Notas',        roles: [ROLES.ADMIN, ROLES.DOCENTE] },
+  { titulo: 'Mis Cursos',  descripcion: 'Ver mis cursos',         icono: 'albums',          pantalla: 'MisCursos',    roles: [ROLES.DOCENTE] },
+  { titulo: 'Mi Perfil',   descripcion: 'Ver mi cuenta',          icono: 'person',          pantalla: 'MiPerfil',     roles: [ROLES.ADMIN, ROLES.DOCENTE, ROLES.ESTUDIANTE] },
+];
 
   const menuFiltrado = menuItems.filter(
     item => !usuario || item.roles.includes(usuario.rol)
@@ -88,17 +89,7 @@ export default function DashboardScreen({ navigation }) {
         colors={['#2980B9', '#4A90E2']}
         style={styles.header}
       >
-        <View style={styles.circulo1} />
-        <View style={styles.circulo2} />
-
         <View style={styles.headerContent}>
-          <View style={styles.headerLogo}>
-            <Image
-              source={require('../../assets/logo.png')}
-              style={styles.headerLogoImg}
-              resizeMode="contain"
-            />
-          </View>
           <View style={styles.headerTextos}>
             <Text style={styles.saludo}>{getSaludo()},</Text>
             <Text style={styles.username}>{usuario?.username || '...'}</Text>
@@ -107,14 +98,24 @@ export default function DashboardScreen({ navigation }) {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.avatarBtn} onPress={handleLogout}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarTexto}>
-                {usuario?.username?.charAt(0).toUpperCase() || '?'}
-              </Text>
-            </View>
-            <Text style={styles.salirTexto}>Salir</Text>
-          </TouchableOpacity>
+          <View style={styles.headerDerecha}>
+            <Image
+              source={require('../../assets/logo.png')}
+              style={styles.headerLogoImg}
+              resizeMode="contain"
+            />
+            <TouchableOpacity style={styles.avatarBtn} onPress={handleLogout}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarTexto}>
+                  {usuario?.username?.charAt(0).toUpperCase() || '?'}
+                </Text>
+              </View>
+              <View style={styles.salirContainer}>
+                <Ionicons name="log-out-outline" size={14} color="rgba(255,255,255,0.8)" />
+                <Text style={styles.salirTexto}> Salir</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       </LinearGradient>
 
@@ -125,18 +126,23 @@ export default function DashboardScreen({ navigation }) {
         <View style={styles.grid}>
           {menuFiltrado.map((item, index) => (
             <TouchableOpacity
-              key={index}
-              style={styles.tarjeta}
-              onPress={() => navigation.navigate(item.pantalla)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.tarjetaIcono}>{item.icono}</Text>
-              <Text style={styles.tarjetaTitulo}>{item.titulo}</Text>
-              <Text style={styles.tarjetaDesc}>{item.descripcion}</Text>
-              <View style={styles.tarjetaFlecha}>
-                <Text style={styles.flechaTexto}>›</Text>
-              </View>
-            </TouchableOpacity>
+            key={index}
+            style={styles.tarjeta}
+            onPress={() => navigation.navigate(item.pantalla)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.tarjetaIconoContainer}>
+              <Ionicons name={item.icono} size={28} color={COLORS.primary} />
+            </View>
+            <Text style={styles.tarjetaTitulo}>{item.titulo}</Text>
+            <Text style={styles.tarjetaDesc}>{item.descripcion}</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={COLORS.border}
+              style={styles.tarjetaFlecha}
+            />
+          </TouchableOpacity>
           ))}
         </View>
       </View>
@@ -182,6 +188,7 @@ const styles = StyleSheet.create({
     borderRadius:    50,
     backgroundColor: 'rgba(255,255,255,0.06)',
   },
+  salirContainer: { flexDirection: 'row', alignItems: 'center' },
   headerContent: {
     flexDirection:  'row',
     justifyContent: 'space-between',
@@ -275,10 +282,19 @@ const styles = StyleSheet.create({
     color:        COLORS.textLight,
     lineHeight:   16,
   },
+  tarjetaIconoContainer: {
+    width:           48,
+    height:          48,
+    borderRadius:    12,
+    backgroundColor: '#EBF5FB',
+    justifyContent:  'center',
+    alignItems:      'center',
+    marginBottom:    10,
+  },
   tarjetaFlecha: {
     position: 'absolute',
     top:      12,
-    right:    14,
+    right:    12,
   },
   flechaTexto: {
     fontSize: 20,
@@ -298,20 +314,15 @@ const styles = StyleSheet.create({
     fontSize:  11,
     marginTop: 4,
   },
-  headerLogo: {
-  position:        'absolute',
-  top:             16,
-  right:           16,
-  width:           50,
-  height:          50,
-  borderRadius:    25,
-  backgroundColor: 'rgba(255,255,255,0.95)',
-  justifyContent:  'center',
-  alignItems:      'center',
-  overflow:        'hidden',
-},
-headerLogoImg: {
-  width:  40,
-  height: 40,
-},
+  headerDerecha: {
+    flexDirection: 'row',
+    alignItems:    'center',
+    gap:           12,
+  },
+  headerLogoImg: {
+    width:           45,
+    height:          45,
+    borderRadius:    22,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+  },
 });

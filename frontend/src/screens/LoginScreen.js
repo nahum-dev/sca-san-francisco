@@ -7,6 +7,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import authService from '../services/authService';
 import { COLORS } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 
 const { height } = Dimensions.get('window');
@@ -78,34 +79,39 @@ export default function LoginScreen({ navigation }) {
         ) : null}
 
         {/* Campo usuario */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputIcono}>👤</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Usuario o correo electrónico"
-            placeholderTextColor={COLORS.textLight}
-            value={identifier}
-            onChangeText={setIdentifier}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-        </View>
+<View style={styles.inputContainer}>
+  <Ionicons name="person-outline" size={20} color={COLORS.textLight} style={{ marginRight: 10 }} />
+  <TextInput
+    style={styles.input}
+    placeholder="Usuario o correo electrónico"
+    placeholderTextColor={COLORS.textLight}
+    value={identifier}
+    onChangeText={setIdentifier}
+    autoCapitalize="none"
+    keyboardType="email-address"
+  />
+</View>
 
-        {/* Campo contraseña */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputIcono}>🔒</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Contraseña"
-            placeholderTextColor={COLORS.textLight}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPass}
-          />
-          <TouchableOpacity onPress={() => setShowPass(!showPass)}>
-            <Text style={styles.showPassTexto}>{showPass ? '🙈' : '👁️'}</Text>
-          </TouchableOpacity>
-        </View>
+{/* Campo contraseña */}
+<View style={styles.inputContainer}>
+  <Ionicons name="lock-closed-outline" size={20} color={COLORS.textLight} style={{ marginRight: 10 }} />
+  <TextInput
+    style={styles.input}
+    placeholder="Contraseña"
+    placeholderTextColor={COLORS.textLight}
+    value={password}
+    onChangeText={setPassword}
+    secureTextEntry={!showPass}
+  />
+  <TouchableOpacity onPress={() => setShowPass(!showPass)}>
+    <Ionicons
+      name={showPass ? 'eye-off-outline' : 'eye-outline'}
+      size={22}
+      color={COLORS.textLight}
+      style={{ padding: 4 }}
+    />
+  </TouchableOpacity>
+</View>
 
         {/* Botón login */}
         <TouchableOpacity

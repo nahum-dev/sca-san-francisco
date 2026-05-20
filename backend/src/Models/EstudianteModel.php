@@ -14,30 +14,30 @@ final class EstudianteModel
         $this->db = Database::getConnection();
     }
 
-    public function getAll(int $limit = 20, int $offset = 0, string $search = ''): array
-    {
-        $params = [];
-        $sql = "SELECT e.id, e.codigo, e.nombres, e.apellidos,
-                    e.fecha_nac, e.genero, e.grado, e.seccion,
-                    e.telefono, u.email, u.activo
-                FROM ESTUDIANTES e
-                INNER JOIN USUARIOS u ON u.id = e.usuario_id
-                WHERE u.activo = 1";
+    public function getAll(int $limit = 100, int $offset = 0, string $search = ''): array
+{
+    $params = [];
+    $sql = "SELECT e.id, e.codigo, e.nombres, e.apellidos,
+                   e.fecha_nac, e.genero, e.grado, e.seccion,
+                   e.telefono, u.email, u.activo
+            FROM ESTUDIANTES e
+            INNER JOIN USUARIOS u ON u.id = e.usuario_id
+            WHERE u.activo = 1";
 
-        if (!empty($search)) {
-            $sql .= " AND (e.nombres LIKE :search
-                    OR e.apellidos LIKE :search
-                    OR e.codigo LIKE :search
-                    OR CONCAT(e.nombres, ' ', e.apellidos) LIKE :search)";
-            $params[':search'] = "%{$search}%";
-        }
-
-        $sql .= " ORDER BY e.apellidos, e.nombres";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+    if (!empty($search)) {
+        $sql .= " AND (e.nombres LIKE :search1
+                   OR e.apellidos LIKE :search2
+                   OR e.codigo LIKE :search3)";
+        $params[':search1'] = "%{$search}%";
+        $params[':search2'] = "%{$search}%";
+        $params[':search3'] = "%{$search}%";
     }
 
+    $sql .= " ORDER BY e.apellidos, e.nombres";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
         public function findByUsuarioId(int $usuarioId): array|false
     {
         $sql = "SELECT e.*, u.email, u.username

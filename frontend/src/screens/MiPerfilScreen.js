@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 import authService from '../services/authService';
 import { COLORS, ROLES } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function MiPerfilScreen({ navigation }) {
   const [usuario,    setUsuario]    = useState(null);
@@ -104,13 +105,16 @@ export default function MiPerfilScreen({ navigation }) {
               <TouchableOpacity
                 key={mat.id}
                 style={styles.cursoCard}
-                onPress={() => navigation.navigate('MisNotas', {
-                  matriculaId:      mat.id,
-                  asignaturaNombre: mat.asignatura_nombre,
-                })}
+                onPress={() => {
+                  console.log('Navegando a notas con matriculaId:', mat.id);
+                  navigation.navigate('MisNotas', {
+                    matriculaId:      mat.id,
+                    asignaturaNombre: mat.asignatura_nombre,
+                  });
+                }}
               >
                 <View style={styles.cursoIcono}>
-                  <Text style={styles.cursoIconoTexto}>📖</Text>
+                  <Ionicons name="book-outline" size={22} color={COLORS.primary} />
                 </View>
                 <View style={styles.cursoInfo}>
                   <Text style={styles.cursoNombre}>{mat.asignatura_nombre}</Text>
@@ -121,7 +125,7 @@ export default function MiPerfilScreen({ navigation }) {
                     👨‍🏫 {mat.docente_apellidos}, {mat.docente_nombres}
                   </Text>
                 </View>
-                <Text style={styles.flecha}>›</Text>
+                <Ionicons name="chevron-forward" size={22} color={COLORS.textLight} />
               </TouchableOpacity>
             ))
           )}
@@ -129,15 +133,17 @@ export default function MiPerfilScreen({ navigation }) {
       )}
 
       <TouchableOpacity
-  style={styles.btnCambiarPass}
-  onPress={() => navigation.navigate('CambiarPassword')}
->
-  <Text style={styles.btnCambiarPassTexto}>🔐 Cambiar Contraseña</Text>
-</TouchableOpacity>
+        style={styles.btnCambiarPass}
+        onPress={() => navigation.navigate('CambiarPassword')}
+      >
+          <Ionicons name="lock-closed-outline" size={18} color={COLORS.white} />
+          <Text style={styles.btnCambiarPassTexto}> Cambiar Contraseña</Text>
+      </TouchableOpacity>
 
       {/* Botón cerrar sesión */}
       <TouchableOpacity style={styles.btnLogout} onPress={handleLogout}>
-        <Text style={styles.btnLogoutTexto}>🚪 Cerrar Sesión</Text>
+        <Ionicons name="log-out-outline" size={18} color={COLORS.white} />
+        <Text style={styles.btnLogoutTexto}> Cerrar Sesión</Text>
       </TouchableOpacity>
 
     </ScrollView>
@@ -145,8 +151,6 @@ export default function MiPerfilScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  btnCambiarPass:      { margin: 20, marginBottom: 0, backgroundColor: COLORS.primary, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-btnCambiarPassTexto: { color: COLORS.white, fontWeight: 'bold', fontSize: 16 },
   container:      { flex: 1, backgroundColor: COLORS.background },
   centered:       { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header:         { backgroundColor: COLORS.primary, padding: 32, alignItems: 'center' },
@@ -168,6 +172,8 @@ btnCambiarPassTexto: { color: COLORS.white, fontWeight: 'bold', fontSize: 16 },
   cursoNombre:    { fontSize: 15, fontWeight: 'bold', color: COLORS.text, marginBottom: 4 },
   cursoDetalle:   { fontSize: 12, color: COLORS.textLight, marginTop: 2 },
   flecha:         { fontSize: 24, color: COLORS.textLight },
-  btnLogout:      { margin: 20, backgroundColor: COLORS.error, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-  btnLogoutTexto: { color: COLORS.white, fontWeight: 'bold', fontSize: 16 },
+  btnCambiarPass:      { margin: 20, marginBottom: 0, backgroundColor: COLORS.primary, borderRadius: 12, paddingVertical: 14, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
+  btnCambiarPassTexto: { color: COLORS.white, fontWeight: 'bold', fontSize: 16 },
+  btnLogout:           { margin: 20, backgroundColor: COLORS.error, borderRadius: 12, paddingVertical: 14, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
+  btnLogoutTexto:      { color: COLORS.white, fontWeight: 'bold', fontSize: 16 },
 });

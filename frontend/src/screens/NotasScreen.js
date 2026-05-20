@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import { COLORS } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function NotasScreen() {
   const [matriculaId, setMatriculaId] = useState('');
@@ -39,6 +40,12 @@ export default function NotasScreen() {
     proyecto:      '#9B59B6',
     participacion: '#27AE60',
   };
+  const TIPO_ICONOS = {
+  examen:        'document-text-outline',
+  tarea:         'pencil-outline',
+  proyecto:      'construct-outline',
+  participacion: 'hand-left-outline',
+};
 
   const cargarNotas = async () => {
     if (!matriculaId.trim()) {
@@ -118,8 +125,9 @@ export default function NotasScreen() {
     <View style={styles.tarjeta}>
       <View style={styles.tarjetaHeader}>
         <View style={[styles.tipoBadge, { backgroundColor: TIPO_COLORES[item.tipo_eval] }]}>
+          <Ionicons name={TIPO_ICONOS[item.tipo_eval]} size={12} color={COLORS.white} />
           <Text style={styles.tipoTexto}>
-            {item.tipo_eval.charAt(0).toUpperCase() + item.tipo_eval.slice(1)}
+            {' '}{item.tipo_eval.charAt(0).toUpperCase() + item.tipo_eval.slice(1)}
           </Text>
         </View>
         <TouchableOpacity onPress={() => eliminarNota(item.id)}>
@@ -257,12 +265,17 @@ export default function NotasScreen() {
                   ]}
                   onPress={() => setForm(prev => ({ ...prev, tipo_eval: tipo }))}
                 >
+                  <Ionicons
+                    name={TIPO_ICONOS[tipo]}
+                    size={16}
+                    color={form.tipo_eval === tipo ? COLORS.white : TIPO_COLORES[tipo]}
+                  />
                   <Text style={[
                     styles.tipoBtnTexto,
                     { color: TIPO_COLORES[tipo] },
                     form.tipo_eval === tipo && { color: COLORS.white },
                   ]}>
-                    {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                    {' '}{tipo.charAt(0).toUpperCase() + tipo.slice(1)}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -427,11 +440,7 @@ const styles = StyleSheet.create({
     alignItems:     'center',
     marginBottom:   8,
   },
-  tipoBadge: {
-    borderRadius:      12,
-    paddingVertical:   4,
-    paddingHorizontal: 10,
-  },
+
   tipoTexto: {
     color:      COLORS.white,
     fontSize:   12,
@@ -500,17 +509,7 @@ const styles = StyleSheet.create({
   dosCampos: {
     flexDirection: 'row',
   },
-  tipoBtn: {
-    borderWidth:       1,
-    borderRadius:      20,
-    paddingVertical:   6,
-    paddingHorizontal: 14,
-    marginRight:       8,
-  },
-  tipoBtnTexto: {
-    fontSize:   13,
-    fontWeight: '600',
-  },
+
   modalBotones: {
     flexDirection: 'row',
     gap:           12,
@@ -549,4 +548,7 @@ estudianteInfo:   { marginBottom: 12, borderBottomWidth: 1, borderBottomColor: C
 estudianteNombre: { fontSize: 17, fontWeight: 'bold', color: COLORS.text },
 estudianteCodigo: { fontSize: 13, color: COLORS.textLight, marginTop: 4 },
 asignaturaNombre: { fontSize: 14, color: COLORS.primary, fontWeight: '600', marginTop: 4 },
+tipoBadge:    { flexDirection: 'row', alignItems: 'center', borderRadius: 12, paddingVertical: 4, paddingHorizontal: 10 },
+tipoBtn:      { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14, marginRight: 8 },
+tipoBtnTexto: { fontSize: 13, fontWeight: '600' },
 });

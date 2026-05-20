@@ -1,7 +1,6 @@
 // screens/EstudiantesScreen.js
 // Lista de estudiantes con búsqueda y botón para agregar.
 
-import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,6 +14,7 @@ import {
 } from 'react-native';
 import estudianteService from '../services/estudianteService';
 import { COLORS } from '../utils/constants';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 export default function EstudiantesScreen({ navigation }) {
   const [estudiantes, setEstudiantes] = useState([]);
@@ -22,34 +22,37 @@ export default function EstudiantesScreen({ navigation }) {
   const [loading,     setLoading]     = useState(true);
   const [refreshing,  setRefreshing]  = useState(false);
 
-  // Cargar estudiantes al abrir la pantalla
-  useEffect(() => {
-    cargarEstudiantes();
-  }, []);
+  // Ref para el texto de búsqueda sin causar re-renders
+  const searchRef = useRef('');
+
+  useEffect(() => { cargarEstudiantes(''); }, []);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      cargarEstudiantes();
-    });
+    const unsubscribe = navigation.addListener('focus', () => cargarEstudiantes(''));
     return unsubscribe;
   }, [navigation]);
 
   const cargarEstudiantes = async (searchTerm = '') => {
-  setLoading(true);
-  try {
-    const data = await estudianteService.getAll(searchTerm);
-    setEstudiantes(data);
-  } catch (err) {
-    Alert.alert('Error', 'No se pudo cargar la lista de estudiantes.');
-  } finally {
-    setLoading(false);
-    setRefreshing(false);
-  }
-};
-  const handleSearch = useCallback(async (texto) => {
-  setSearch(texto);
-  await cargarEstudiantes(texto);
-}, []);
+    setLoading(true);
+    try {
+      const data = await estudianteService.getAll(searchTerm);
+      setEstudiantes(data);
+    } catch (err) {
+      Alert.alert('Error', 'No se pudo cargar la lista de estudiantes.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const handleSearchChange = (texto) => {
+    setSearch(texto);
+    searchRef.current = texto;
+  };
+
+  const handleBuscar = () => {
+    cargarEstudiantes(searchRef.current);
+  };
 
   const handleEliminar = (id, nombre) => {
     Alert.alert(
@@ -112,15 +115,25 @@ export default function EstudiantesScreen({ navigation }) {
 
       {/* Barra de búsqueda */}
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar por nombre o código..."
-          placeholderTextColor={COLORS.textLight}
-          value={search}
-          onChangeText={handleSearch}
-        />
+        <View style={styles.searchRow}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar por nombre o código..."
+            placeholderTextColor={COLORS.textLight}
+            value={search}
+            onChangeText={handleSearchChange}
+            returnKeyType="search"
+            onSubmitEditing={handleBuscar}
+            blurOnSubmit={false}
+          />
+          <TouchableOpacity
+            style={styles.searchBtn}
+            onPress={handleBuscar}
+          >
+            <Text style={styles.searchBtnTexto}>Buscar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
       {/* Lista */}
       <FlatList
         data={estudiantes}
@@ -252,4 +265,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize:   15,
   },
+  searchRow:    { flexDirection: 'row', gap: 8, alignItems: 'center' },
+searchBtn:    { backgroundColor: COLORS.primary, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 14 },
+searchBtnTexto: { color: COLORS.white, fontWeight: '600', fontSize: 14 },
 });

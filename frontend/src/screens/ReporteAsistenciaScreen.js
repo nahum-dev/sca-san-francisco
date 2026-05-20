@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import { COLORS } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ReporteAsistenciaScreen({ route }) {
   const cursoId     = route.params?.cursoId;
@@ -59,11 +60,11 @@ export default function ReporteAsistenciaScreen({ route }) {
   };
 
   const ESTADO_CONFIG = {
-    presente:    { color: '#27AE60', icono: '✅' },
-    ausente:     { color: '#E74C3C', icono: '❌' },
-    tardanza:    { color: '#F39C12', icono: '⏰' },
-    justificado: { color: '#8E44AD', icono: '📋' },
-  };
+  presente:    { icono: 'checkmark-circle', color: '#27AE60' },
+  ausente:     { icono: 'close-circle',     color: '#E74C3C' },
+  tardanza:    { icono: 'time',             color: '#F39C12' },
+  justificado: { icono: 'clipboard',        color: '#8E44AD' },
+};
 
   const renderEstudiante = ({ item }) => (
     <TouchableOpacity
@@ -89,26 +90,21 @@ export default function ReporteAsistenciaScreen({ route }) {
       </View>
 
       <View style={styles.statsRow}>
-        <View style={styles.statItem}>
-          <Text style={[styles.statNumero, { color: '#27AE60' }]}>{item.presentes || 0}</Text>
-          <Text style={styles.statLabel}>Presentes</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={[styles.statNumero, { color: '#E74C3C' }]}>{item.ausentes || 0}</Text>
-          <Text style={styles.statLabel}>Ausentes</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={[styles.statNumero, { color: '#F39C12' }]}>{item.tardanzas || 0}</Text>
-          <Text style={styles.statLabel}>Tardanzas</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={[styles.statNumero, { color: '#8E44AD' }]}>{item.justificados || 0}</Text>
-          <Text style={styles.statLabel}>Justificados</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumero}>{item.total_dias || 0}</Text>
-          <Text style={styles.statLabel}>Total días</Text>
-        </View>
+        {[
+          { key: 'presentes',    label: 'Presentes',   icono: 'checkmark-circle', color: '#27AE60' },
+          { key: 'ausentes',     label: 'Ausentes',    icono: 'close-circle',     color: '#E74C3C' },
+          { key: 'tardanzas',    label: 'Tardanzas',   icono: 'time',             color: '#F39C12' },
+          { key: 'justificados', label: 'Justif.',     icono: 'clipboard',        color: '#8E44AD' },
+          { key: 'total_dias',   label: 'Total',       icono: 'calendar',         color: COLORS.text },
+        ].map(stat => (
+          <View key={stat.key} style={styles.statItem}>
+            <Ionicons name={stat.icono} size={18} color={stat.color} />
+            <Text style={[styles.statNumero, { color: stat.color }]}>
+              {item[stat.key] || 0}
+            </Text>
+            <Text style={styles.statLabel}>{stat.label}</Text>
+          </View>
+        ))}
       </View>
 
       <Text style={styles.verDetalle}>Ver detalle →</Text>
@@ -116,31 +112,26 @@ export default function ReporteAsistenciaScreen({ route }) {
   );
 
   const renderDetalle = ({ item }) => (
-    <View style={styles.detalleItem}>
-      <Text style={styles.detalleIcono}>
-        {ESTADO_CONFIG[item.estado]?.icono || '❓'}
-      </Text>
-      <View style={styles.detalleInfo}>
-        <Text style={styles.detalleFecha}>{item.fecha}</Text>
-        {item.observaciones ? (
-          <Text style={styles.detalleObs}>{item.observaciones}</Text>
-        ) : null}
-      </View>
-      <Text style={[styles.detalleEstado, {
-        color: ESTADO_CONFIG[item.estado]?.color || COLORS.textLight
-      }]}>
-        {item.estado?.charAt(0).toUpperCase() + item.estado?.slice(1)}
-      </Text>
+  <View style={styles.detalleItem}>
+    <Ionicons
+      name={ESTADO_CONFIG[item.estado]?.icono || 'help-circle'}
+      size={28}
+      color={ESTADO_CONFIG[item.estado]?.color || COLORS.textLight}
+      style={{ marginRight: 12 }}
+    />
+    <View style={styles.detalleInfo}>
+      <Text style={styles.detalleFecha}>{item.fecha}</Text>
+      {item.observaciones ? (
+        <Text style={styles.detalleObs}>{item.observaciones}</Text>
+      ) : null}
     </View>
-  );
-
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-      </View>
-    );
-  }
+    <Text style={[styles.detalleEstado, {
+      color: ESTADO_CONFIG[item.estado]?.color || COLORS.textLight
+    }]}>
+      {item.estado?.charAt(0).toUpperCase() + item.estado?.slice(1)}
+    </Text>
+  </View>
+);
 
   return (
     <View style={styles.container}>

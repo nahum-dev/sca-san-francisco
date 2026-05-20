@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import { COLORS } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function CursosScreen({ navigation }) {
   const [cursos,     setCursos]     = useState([]);
@@ -42,26 +43,28 @@ export default function CursosScreen({ navigation }) {
   };
 
   const handleEliminar = (id, nombre) => {
-    Alert.alert(
-      'Desactivar Curso',
-      `¿Deseas desactivar el curso "${nombre}"?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Desactivar',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await api.delete(`/cursos/${id}`);
-              cargarCursos();
-            } catch (err) {
-              Alert.alert('Error', 'No se pudo desactivar el curso.');
-            }
-          },
+  Alert.alert(
+    'Desactivar Curso',
+    `¿Deseas desactivar el curso "${nombre}"?`,
+    [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Desactivar',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await api.delete(`/cursos/${id}`);
+            Alert.alert('Éxito', 'Curso desactivado.');
+            cargarCursos();
+          } catch (err) {
+            Alert.alert('Error', err.response?.data?.message || 'No se pudo desactivar.');
+            console.error(err.response?.data);
+          }
         },
-      ]
-    );
-  };
+      },
+    ]
+  );
+};
 
   const renderCurso = ({ item }) => (
     <View style={styles.tarjeta}>
@@ -116,14 +119,24 @@ export default function CursosScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
+      <View style={styles.searchRow}>
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar por asignatura, docente o grado..."
           placeholderTextColor={COLORS.textLight}
           value={search}
           onChangeText={handleSearch}
+          returnKeyType="search"
+          blurOnSubmit={false}
         />
+        <TouchableOpacity
+          style={styles.searchBtn}
+          onPress={() => cargarCursos()}
+        >
+          <Text style={styles.searchBtnTexto}>Buscar</Text>
+        </TouchableOpacity>
       </View>
+    </View>
 
       <FlatList
         data={cursos}
@@ -177,4 +190,10 @@ const styles = StyleSheet.create({
   vacio:           { color: COLORS.textLight, fontSize: 15 },
   fab:             { position: 'absolute', bottom: 24, right: 24, backgroundColor: COLORS.primary, borderRadius: 30, paddingVertical: 14, paddingHorizontal: 24, elevation: 6 },
   fabTexto:        { color: COLORS.white, fontWeight: 'bold', fontSize: 15 },
+  searchRow:    { flexDirection: 'row', gap: 8, alignItems: 'center' },
+searchBtn:    { backgroundColor: COLORS.primary, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 14 },
+searchBtnTexto: { color: COLORS.white, fontWeight: '600', fontSize: 14 },
+searchRow:      { flexDirection: 'row', gap: 8, alignItems: 'center' },
+searchBtn:      { backgroundColor: COLORS.primary, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 14 },
+searchBtnTexto: { color: COLORS.white, fontWeight: '600', fontSize: 14 },
 });

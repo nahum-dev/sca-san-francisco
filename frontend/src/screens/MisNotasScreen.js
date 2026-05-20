@@ -5,10 +5,13 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import { COLORS } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function MisNotasScreen({ route }) {
   const matriculaId      = route.params?.matriculaId;
   const asignaturaNombre = route.params?.asignaturaNombre || 'Mis Notas';
+
+  console.log('MisNotas - matriculaId:', matriculaId);
 
   const [notas,      setNotas]      = useState([]);
   const [resumen,    setResumen]    = useState(null);
@@ -25,19 +28,20 @@ export default function MisNotasScreen({ route }) {
   useEffect(() => { cargarNotas(); }, []);
 
   const cargarNotas = async () => {
-    try {
-      const response = await api.get('/notas', {
-        params: { matricula_id: matriculaId },
-      });
-      setNotas(response.data.data.notas);
-      setResumen(response.data.data.resumen);
-    } catch (err) {
-      Alert.alert('Error', 'No se pudieron cargar las notas.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+  try {
+    const response = await api.get('/notas', {
+      params: { matricula_id: matriculaId },
+    });
+    setNotas(response.data.data.notas || []);
+    setResumen(response.data.data.resumen || null);
+  } catch (err) {
+    console.error(err);
+    Alert.alert('Error', 'No se pudieron cargar las notas. Verifica que tengas notas registradas.');
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+};
 
   const getPromedioColor = (promedio) => {
     if (promedio >= 7) return '#27AE60';
@@ -48,10 +52,21 @@ export default function MisNotasScreen({ route }) {
   const renderNota = ({ item }) => (
     <View style={styles.tarjeta}>
       <View style={[styles.tipoBadge, { backgroundColor: TIPO_COLORES[item.tipo_eval] + '20' }]}>
+        <Ionicons
+          name={
+            item.tipo_eval === 'examen'        ? 'document-text-outline' :
+            item.tipo_eval === 'tarea'         ? 'pencil-outline'        :
+            item.tipo_eval === 'proyecto'      ? 'construct-outline'     :
+                                                'hand-left-outline'
+          }
+          size={14}
+          color={TIPO_COLORES[item.tipo_eval]}
+        />
         <Text style={[styles.tipoTexto, { color: TIPO_COLORES[item.tipo_eval] }]}>
-          {item.tipo_eval.charAt(0).toUpperCase() + item.tipo_eval.slice(1)}
+          {' '}{item.tipo_eval.charAt(0).toUpperCase() + item.tipo_eval.slice(1)}
         </Text>
       </View>
+
       <Text style={styles.descripcion}>{item.descripcion}</Text>
       <View style={styles.tarjetaFooter}>
         <Text style={[styles.calificacion, {
@@ -126,7 +141,7 @@ export default function MisNotasScreen({ route }) {
         }
         ListEmptyComponent={
           <View style={styles.centered}>
-            <Text style={styles.emptyIcon}>📝</Text>
+            <Ionicons name="document-outline" size={50} color={COLORS.textLight} />
             <Text style={styles.vacio}>No hay notas registradas aún.</Text>
           </View>
         }
@@ -148,7 +163,7 @@ const styles = StyleSheet.create({
   resumenDivider: { width: 1, backgroundColor: COLORS.border },
   lista:          { padding: 16, paddingTop: 0, paddingBottom: 40 },
   tarjeta:        { backgroundColor: COLORS.white, borderRadius: 10, padding: 14, marginBottom: 10, elevation: 2 },
-  tipoBadge:      { alignSelf: 'flex-start', borderRadius: 8, paddingVertical: 4, paddingHorizontal: 10, marginBottom: 8 },
+  tipoBadge: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', borderRadius: 8, paddingVertical: 4, paddingHorizontal: 10, marginBottom: 8 },
   tipoTexto:      { fontSize: 12, fontWeight: 'bold' },
   descripcion:    { fontSize: 15, fontWeight: '600', color: COLORS.text, marginBottom: 8 },
   tarjetaFooter:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

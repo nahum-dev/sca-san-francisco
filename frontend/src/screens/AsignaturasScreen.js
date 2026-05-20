@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import { COLORS } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AsignaturasScreen({ navigation }) {
   const [asignaturas, setAsignaturas] = useState([]);
@@ -141,14 +142,24 @@ export default function AsignaturasScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar por nombre o código..."
-          placeholderTextColor={COLORS.textLight}
-          value={search}
-          onChangeText={handleSearch}
-        />
-      </View>
+  <View style={styles.searchRow}>
+    <TextInput
+      style={styles.searchInput}
+      placeholder="Buscar por nombre o código..."
+      placeholderTextColor={COLORS.textLight}
+      value={search}
+      onChangeText={handleSearch}
+      returnKeyType="search"
+      blurOnSubmit={false}
+    />
+    <TouchableOpacity
+      style={styles.searchBtn}
+      onPress={() => cargarAsignaturas()}
+    >
+      <Text style={styles.searchBtnTexto}>Buscar</Text>
+    </TouchableOpacity>
+  </View>
+</View>
 
       <FlatList
         data={asignaturas}
@@ -201,4 +212,7 @@ const styles = StyleSheet.create({
   fab:             { position: 'absolute', bottom: 24, right: 24, backgroundColor: COLORS.primary, borderRadius: 30, paddingVertical: 14, paddingHorizontal: 24, elevation: 6 },
   fabTexto:        { color: COLORS.white, fontWeight: 'bold', fontSize: 15 },
   btnActivar: { flex:            1, backgroundColor: '#27AE60',borderRadius:    6, paddingVertical: 8, alignItems:      'center'},
+  searchRow:      { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  searchBtn:      { backgroundColor: COLORS.primary, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 14 },
+  searchBtnTexto: { color: COLORS.white, fontWeight: '600', fontSize: 14 },
 });

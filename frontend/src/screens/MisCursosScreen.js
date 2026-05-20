@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import { COLORS } from '../utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function MisCursosScreen({ navigation }) {
   const [cursos,     setCursos]     = useState([]);
@@ -47,34 +48,37 @@ export default function MisCursosScreen({ navigation }) {
       </View>
 
       <View style={styles.acciones}>
-  <TouchableOpacity
-    style={styles.btnAsistencia}
-    onPress={() => navigation.navigate('Asistencia', {
-      cursoId:     item.id,
-      cursoNombre: item.asignatura_nombre,
-    })}
-  >
-    <Text style={styles.btnTexto}>📋 Asistencia</Text>
-  </TouchableOpacity>
-  <TouchableOpacity
-    style={styles.btnNotas}
-    onPress={() => navigation.navigate('EstudiantesCurso', {
-      cursoId:     item.id,
-      cursoNombre: item.asignatura_nombre,
-    })}
-  >
-    <Text style={styles.btnTexto}>📝 Notas</Text>
-  </TouchableOpacity>
-  <TouchableOpacity
-    style={styles.btnReporte}
-    onPress={() => navigation.navigate('ReporteAsistencia', {
-      cursoId:     item.id,
-      cursoNombre: item.asignatura_nombre,
-    })}
-  >
-    <Text style={styles.btnTexto}>📊 Reporte</Text>
-  </TouchableOpacity>
-</View>
+        <TouchableOpacity
+          style={styles.btnAsistencia}
+          onPress={() => navigation.navigate('Asistencia', {
+            cursoId:     item.id,
+            cursoNombre: item.asignatura_nombre,
+          })}
+        >
+          <Ionicons name="clipboard-outline" size={16} color={COLORS.white} />
+          <Text style={styles.btnTexto}> Asistencia</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.btnNotas}
+          onPress={() => navigation.navigate('EstudiantesCurso', {
+            cursoId:     item.id,
+            cursoNombre: item.asignatura_nombre,
+          })}
+        >
+          <Ionicons name="create-outline" size={16} color={COLORS.white} />
+          <Text style={styles.btnTexto}> Notas</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.btnReporte}
+          onPress={() => navigation.navigate('ReporteAsistencia', {
+            cursoId:     item.id,
+            cursoNombre: item.asignatura_nombre,
+          })}
+        >
+          <Ionicons name="bar-chart-outline" size={16} color={COLORS.white} />
+          <Text style={styles.btnTexto}> Reporte</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Acciones del docente */}
       <View style={styles.acciones}>
@@ -149,17 +153,11 @@ const styles = StyleSheet.create({
   infoTexto:       { fontSize: 13, color: COLORS.textLight },
   periodo:         { fontSize: 12, color: COLORS.primary, fontWeight: '600' },
   acciones:        { flexDirection: 'row', gap: 10 },
-  btnAsistencia:   { flex: 1, backgroundColor: '#27AE60', borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
-  btnNotas:        { flex: 1, backgroundColor: COLORS.primary, borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
-  btnTexto:        { color: COLORS.white, fontWeight: 'bold', fontSize: 13 },
+  btnAsistencia: { flex: 1, backgroundColor: '#27AE60', borderRadius: 8, paddingVertical: 10, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
+  btnNotas:      { flex: 1, backgroundColor: COLORS.primary, borderRadius: 8, paddingVertical: 10, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
+  btnReporte:    { flex: 1, backgroundColor: '#8E44AD', borderRadius: 8, paddingVertical: 10, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
+  btnTexto:      { color: COLORS.white, fontWeight: 'bold', fontSize: 12 },
   emptyIcon:       { fontSize: 50, marginBottom: 16 },
   vacio:           { color: COLORS.text, fontSize: 16, fontWeight: '600' },
   vacioSub:        { color: COLORS.textLight, fontSize: 14, marginTop: 8 },
-  btnReporte: {
-  flex:            1,
-  backgroundColor: '#8E44AD',
-  borderRadius:    8,
-  paddingVertical: 10,
-  alignItems:      'center',
-},
 });

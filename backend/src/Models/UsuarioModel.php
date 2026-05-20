@@ -28,12 +28,14 @@ final class UsuarioModel
     }
 
     public function findById(int $id): array|false
-    {
-        $sql  = "SELECT id, username, email, rol, activo FROM USUARIOS WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch();
-    }
+{
+    $sql  = "SELECT id, username, email, rol, activo, password_hash 
+             FROM USUARIOS 
+             WHERE id = :id";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':id' => $id]);
+    return $stmt->fetch();
+}
 
     public function emailExists(string $email): bool
     {
