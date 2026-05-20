@@ -15,31 +15,34 @@ final class CursoModel
     }
 
     public function getAll(string $search = ''): array
-    {
-        $params = [];
-        $sql = "SELECT c.id, c.anio_escolar, c.periodo, c.grado, c.seccion, c.activo,
-                    a.id AS asignatura_id, a.codigo AS asignatura_codigo,
-                    a.nombre AS asignatura_nombre,
-                    d.id AS docente_id, d.nombres AS docente_nombres,
-                    d.apellidos AS docente_apellidos
-                FROM CURSOS c
-                INNER JOIN ASIGNATURAS a ON a.id = c.asignatura_id
-                INNER JOIN DOCENTES d    ON d.id = c.docente_id
-                WHERE c.activo = 1";
+{
+    $params = [];
+    $sql = "SELECT c.id, c.anio_escolar, c.periodo, c.grado, c.seccion, c.activo,
+                   a.id AS asignatura_id, a.codigo AS asignatura_codigo,
+                   a.nombre AS asignatura_nombre,
+                   d.id AS docente_id, d.nombres AS docente_nombres,
+                   d.apellidos AS docente_apellidos
+            FROM CURSOS c
+            INNER JOIN ASIGNATURAS a ON a.id = c.asignatura_id
+            INNER JOIN DOCENTES d    ON d.id = c.docente_id
+            WHERE c.activo = 1";
 
-        if (!empty($search)) {
-            $sql .= " AND (a.nombre LIKE :search
-                    OR d.nombres LIKE :search
-                    OR d.apellidos LIKE :search
-                    OR c.grado LIKE :search)";
-            $params[':search'] = "%{$search}%";
-        }
-
-        $sql .= " ORDER BY c.anio_escolar DESC, c.grado, c.seccion";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+    if (!empty($search)) {
+        $sql .= " AND (a.nombre LIKE :search1
+                   OR d.nombres LIKE :search2
+                   OR d.apellidos LIKE :search3
+                   OR c.grado LIKE :search4)";
+        $params[':search1'] = "%{$search}%";
+        $params[':search2'] = "%{$search}%";
+        $params[':search3'] = "%{$search}%";
+        $params[':search4'] = "%{$search}%";
     }
+
+    $sql .= " ORDER BY c.anio_escolar DESC, c.grado, c.seccion";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
 
     public function findById(int $id): array|false
     {

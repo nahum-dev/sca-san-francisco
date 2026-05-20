@@ -79,28 +79,6 @@ export default function MisCursosScreen({ navigation }) {
           <Text style={styles.btnTexto}> Reporte</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Acciones del docente */}
-      <View style={styles.acciones}>
-        <TouchableOpacity
-          style={styles.btnAsistencia}
-          onPress={() => navigation.navigate('Asistencia', {
-            cursoId: item.id,
-            cursoNombre: item.asignatura_nombre,
-          })}
-        >
-          <Text style={styles.btnTexto}>📋 Asistencia</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.btnNotas}
-          onPress={() => navigation.navigate('EstudiantesCurso', {
-            cursoId:     item.id,
-            cursoNombre: item.asignatura_nombre,
-          })}
-        >
-          <Text style={styles.btnTexto}>📝 Notas</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 

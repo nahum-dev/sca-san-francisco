@@ -20,17 +20,19 @@ export default function AsignaturasScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  const cargarAsignaturas = async () => {
-    try {
-      const response = await api.get('/asignaturas', { params: { search } });
-      setAsignaturas(response.data.data);
-    } catch (err) {
-      Alert.alert('Error', 'No se pudo cargar las asignaturas.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+  const cargarAsignaturas = async (searchTerm = search) => {
+  try {
+    const response = await api.get('/asignaturas', { 
+      params: { search: searchTerm } 
+    });
+    setAsignaturas(response.data.data || []);
+  } catch (err) {
+    Alert.alert('Error', 'No se pudo cargar las asignaturas.');
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+};
 
   const handleSearch = async (texto) => {
   setSearch(texto);
@@ -142,24 +144,24 @@ export default function AsignaturasScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-  <View style={styles.searchRow}>
-    <TextInput
-      style={styles.searchInput}
-      placeholder="Buscar por nombre o código..."
-      placeholderTextColor={COLORS.textLight}
-      value={search}
-      onChangeText={handleSearch}
-      returnKeyType="search"
-      blurOnSubmit={false}
-    />
-    <TouchableOpacity
-      style={styles.searchBtn}
-      onPress={() => cargarAsignaturas()}
-    >
-      <Text style={styles.searchBtnTexto}>Buscar</Text>
-    </TouchableOpacity>
-  </View>
-</View>
+        <View style={styles.searchRow}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar por nombre o código..."
+            placeholderTextColor={COLORS.textLight}
+            value={search}
+            onChangeText={handleSearch}
+            returnKeyType="search"
+            blurOnSubmit={false}
+          />
+          <TouchableOpacity
+            style={styles.searchBtn}
+            onPress={() => cargarAsignaturas()}
+          >
+            <Text style={styles.searchBtnTexto}>Buscar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <FlatList
         data={asignaturas}
@@ -213,6 +215,6 @@ const styles = StyleSheet.create({
   fabTexto:        { color: COLORS.white, fontWeight: 'bold', fontSize: 15 },
   btnActivar: { flex:            1, backgroundColor: '#27AE60',borderRadius:    6, paddingVertical: 8, alignItems:      'center'},
   searchRow:      { flexDirection: 'row', gap: 8, alignItems: 'center' },
-  searchBtn:      { backgroundColor: COLORS.primary, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 14 },
-  searchBtnTexto: { color: COLORS.white, fontWeight: '600', fontSize: 14 },
+searchBtn:      { backgroundColor: COLORS.primary, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 14 },
+searchBtnTexto: { color: COLORS.white, fontWeight: '600', fontSize: 14 },
 });

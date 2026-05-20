@@ -15,27 +15,30 @@ final class DocenteModel
     }
 
     public function getAll(string $search = ''): array
-    {
-        $params = [];
-        $sql = "SELECT d.id, d.codigo, d.nombres, d.apellidos,
-                    d.dui, d.especialidad, d.telefono, u.email, u.activo
-                FROM DOCENTES d
-                INNER JOIN USUARIOS u ON u.id = d.usuario_id
-                WHERE u.activo = 1";
+{
+    $params = [];
+    $sql = "SELECT d.id, d.codigo, d.nombres, d.apellidos,
+                   d.dui, d.especialidad, d.telefono, u.email, u.activo
+            FROM DOCENTES d
+            INNER JOIN USUARIOS u ON u.id = d.usuario_id
+            WHERE u.activo = 1";
 
-        if (!empty($search)) {
-            $sql .= " AND (d.nombres LIKE :search
-                    OR d.apellidos LIKE :search
-                    OR d.codigo LIKE :search
-                    OR CONCAT(d.nombres, ' ', d.apellidos) LIKE :search)";
-            $params[':search'] = "%{$search}%";
-        }
-
-        $sql .= " ORDER BY d.apellidos, d.nombres";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+    if (!empty($search)) {
+        $sql .= " AND (d.nombres LIKE :search1
+                   OR d.apellidos LIKE :search2
+                   OR d.codigo LIKE :search3
+                   OR CONCAT(d.nombres, ' ', d.apellidos) LIKE :search4)";
+        $params[':search1'] = "%{$search}%";
+        $params[':search2'] = "%{$search}%";
+        $params[':search3'] = "%{$search}%";
+        $params[':search4'] = "%{$search}%";
     }
+
+    $sql .= " ORDER BY d.apellidos, d.nombres";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
 
     public function findById(int $id): array|false
     {

@@ -59,23 +59,29 @@ export default function FormDocenteScreen({ route, navigation }) {
   };
 
   const handleGuardar = async () => {
-    if (!validar()) return;
-    setLoading(true);
-    try {
-      if (modoEdicion) {
-        await api.put(`/docentes/${docenteExistente.id}`, form);
-        Alert.alert('Éxito', 'Docente actualizado correctamente.');
-      } else {
-        await api.post('/docentes', form);
-        Alert.alert('Éxito', 'Docente creado correctamente.');
-      }
-      navigation.goBack();
-    } catch (err) {
-      Alert.alert('Error', err.response?.data?.message || 'Ocurrió un error.');
-    } finally {
-      setLoading(false);
+  if (!validar()) return;
+  setLoading(true);
+  try {
+    if (modoEdicion) {
+      await api.put(`/docentes/${docenteExistente.id}`, form);
+      Alert.alert('Éxito', 'Docente actualizado correctamente.');
+    } else {
+      await api.post('/docentes', form);
+      const username = `doc.${form.email.split('@')[0]}`;
+      Alert.alert(
+        'Docente Creado',
+        `✅ Creado correctamente.\n\nUsuario de acceso: ${username}\nContraseña: ${form.password}`,
+        [{ text: 'Entendido', onPress: () => navigation.goBack() }]
+      );
+      return;
     }
-  };
+    navigation.goBack();
+  } catch (err) {
+    Alert.alert('Error', err.response?.data?.message || 'Ocurrió un error.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contenido}>

@@ -31,13 +31,13 @@ export default function EstudiantesCursoScreen({ route, navigation }) {
   };
 
   const renderEstudiante = ({ item }) => (
-    <TouchableOpacity
-      style={styles.tarjeta}
-      onPress={() => navigation.navigate('Notas', {
-        matriculaId:     item.id,
-        estudianteNombre: `${item.nombres} ${item.apellidos}`,
-      })}
-    >
+  <TouchableOpacity
+    style={styles.tarjeta}
+    onPress={() => navigation.navigate('Notas', {
+      matriculaId:      item.id,
+      estudianteNombre: `${item.nombres} ${item.apellidos}`,
+    })}
+  >
       <View style={styles.avatar}>
         <Text style={styles.avatarTexto}>
           {item.nombres.charAt(0)}{item.apellidos.charAt(0)}

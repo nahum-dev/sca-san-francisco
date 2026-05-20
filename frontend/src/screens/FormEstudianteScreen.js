@@ -75,25 +75,30 @@ export default function FormEstudianteScreen({ route, navigation }) {
   };
 
   const handleGuardar = async () => {
-    if (!validar()) return;
-
-    setLoading(true);
-    try {
-      if (modoEdicion) {
-        await estudianteService.update(estudianteExistente.id, form);
-        Alert.alert('Éxito', 'Estudiante actualizado correctamente.');
-      } else {
-        await estudianteService.create(form);
-        Alert.alert('Éxito', 'Estudiante creado correctamente.');
-      }
-      navigation.goBack();
-    } catch (err) {
-      const mensaje = err.response?.data?.message || 'Ocurrió un error. Intenta de nuevo.';
-      Alert.alert('Error', mensaje);
-    } finally {
-      setLoading(false);
+  if (!validar()) return;
+  setLoading(true);
+  try {
+    if (modoEdicion) {
+      await estudianteService.update(estudianteExistente.id, form);
+      Alert.alert('Éxito', 'Estudiante actualizado correctamente.');
+    } else {
+      const resultado = await estudianteService.create(form);
+      const username = resultado?.username || `est.${form.email.split('@')[0]}`;
+      Alert.alert(
+        'Estudiante Creado',
+        `✅ Creado correctamente.\n\nUsuario de acceso: ${username}\nContraseña: ${form.password}`,
+        [{ text: 'Entendido', onPress: () => navigation.goBack() }]
+      );
+      return;
     }
-  };
+    navigation.goBack();
+  } catch (err) {
+    const mensaje = err.response?.data?.message || 'Ocurrió un error.';
+    Alert.alert('Error', mensaje);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contenido}>

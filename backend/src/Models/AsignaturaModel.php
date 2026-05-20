@@ -15,22 +15,22 @@ final class AsignaturaModel
     }
 
     public function getAll(string $search = ''): array
-    {
-        $params = [];
-        $sql = "SELECT id, codigo, nombre, descripcion, activa, created_at
-                FROM ASIGNATURAS WHERE 1=1";
+{
+    $params = [];
+    $sql = "SELECT id, codigo, nombre, descripcion, activa, created_at
+            FROM ASIGNATURAS WHERE 1=1";
 
-        if (!empty($search)) {
-            $sql .= " AND (nombre LIKE :search OR codigo LIKE :search)";
-            $params[':search'] = "%{$search}%";
-        }
-
-        $sql .= " ORDER BY nombre";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+    if (!empty($search)) {
+        $sql .= " AND (nombre LIKE :search1 OR codigo LIKE :search2)";
+        $params[':search1'] = "%{$search}%";
+        $params[':search2'] = "%{$search}%";
     }
 
+    $sql .= " ORDER BY nombre";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
     public function findById(int $id): array|false
     {
         $sql  = "SELECT * FROM ASIGNATURAS WHERE id = :id";

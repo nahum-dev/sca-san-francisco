@@ -1,5 +1,5 @@
 // screens/NotasScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,12 +16,15 @@ import api from '../services/api';
 import { COLORS } from '../utils/constants';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function NotasScreen() {
-  const [matriculaId, setMatriculaId] = useState('');
-  const [notas,       setNotas]       = useState([]);
-  const [resumen,     setResumen]     = useState(null);
-  const [loading,     setLoading]     = useState(false);
-  const [buscado,     setBuscado]     = useState(false);
+export default function NotasScreen({ route }) {
+  const matriculaIdParam    = route.params?.matriculaId || null;
+  const estudianteNombre    = route.params?.estudianteNombre || null;
+
+  const [matriculaId,  setMatriculaId]  = useState(matriculaIdParam?.toString() || '');
+  const [notas,        setNotas]        = useState([]);
+  const [resumen,      setResumen]      = useState(null);
+  const [loading,      setLoading]      = useState(false);
+  const [buscado,      setBuscado]      = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
   const [form, setForm] = useState({
@@ -34,29 +37,32 @@ export default function NotasScreen() {
 
   const TIPOS = ['examen', 'tarea', 'proyecto', 'participacion'];
 
-  const TIPO_COLORES = {
-    examen:        '#E74C3C',
-    tarea:         '#3498DB',
-    proyecto:      '#9B59B6',
-    participacion: '#27AE60',
-  };
-  const TIPO_ICONOS = {
+const TIPO_COLORES = {
+  examen:        '#E74C3C',
+  tarea:         '#3498DB',
+  proyecto:      '#9B59B6',
+  participacion: '#27AE60',
+};
+
+const TIPO_ICONOS = {
   examen:        'document-text-outline',
   tarea:         'pencil-outline',
   proyecto:      'construct-outline',
   participacion: 'hand-left-outline',
 };
 
-  const cargarNotas = async () => {
-    if (!matriculaId.trim()) {
-      Alert.alert('Atención', 'Ingresa el ID de matrícula.');
-      return;
+  // Si viene matriculaId por parámetro cargar automáticamente
+  useEffect(() => {
+    if (matriculaIdParam) {
+      cargarNotasDirecto(matriculaIdParam);
     }
+  }, [matriculaIdParam]);
 
+  const cargarNotasDirecto = async (id) => {
     setLoading(true);
     try {
       const response = await api.get('/notas', {
-        params: { matricula_id: matriculaId },
+        params: { matricula_id: id },
       });
       setNotas(response.data.data.notas);
       setResumen(response.data.data.resumen);
@@ -66,6 +72,14 @@ export default function NotasScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const cargarNotas = async () => {
+    if (!matriculaId.trim()) {
+      Alert.alert('Atención', 'Ingresa el ID de matrícula.');
+      return;
+    }
+    cargarNotasDirecto(parseInt(matriculaId));
   };
 
   const guardarNota = async () => {
@@ -151,31 +165,35 @@ export default function NotasScreen() {
 
       {/* Buscador */}
       <View style={styles.filtros}>
-        <Text style={styles.filtroTitulo}>Registro de Notas</Text>
+  <Text style={styles.filtroTitulo}>
+    {estudianteNombre ? `Notas de ${estudianteNombre}` : 'Registro de Notas'}
+  </Text>
 
-        <Text style={styles.label}>ID de Matrícula</Text>
-        <View style={styles.buscarRow}>
-          <TextInput
-            style={[styles.input, { flex: 1, marginBottom: 0 }]}
-            placeholder="Ej: 1"
-            placeholderTextColor={COLORS.textLight}
-            value={matriculaId}
-            onChangeText={setMatriculaId}
-            keyboardType="numeric"
-          />
-          <TouchableOpacity
-            style={styles.botonBuscar}
-            onPress={cargarNotas}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={COLORS.white} size="small" />
-            ) : (
-              <Text style={styles.botonTexto}>Buscar</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
+  {/* Solo mostrar el buscador si no viene de seleccionar estudiante */}
+  {!matriculaIdParam && (
+    <View style={styles.buscarRow}>
+      <TextInput
+        style={[styles.input, { flex: 1, marginBottom: 0 }]}
+        placeholder="ID de Matrícula"
+        placeholderTextColor={COLORS.textLight}
+        value={matriculaId}
+        onChangeText={setMatriculaId}
+        keyboardType="numeric"
+      />
+      <TouchableOpacity
+        style={styles.botonBuscar}
+        onPress={cargarNotas}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color={COLORS.white} size="small" />
+        ) : (
+          <Text style={styles.botonTexto}>Buscar</Text>
+        )}
+      </TouchableOpacity>
+    </View>
+  )}
+</View>
 
       {/* Resumen */}
       {resumen && (
